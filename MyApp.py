@@ -37,25 +37,31 @@ PS : Since it is algorithmic determination, it wont be perfect all the time
 
 column_type = {}
 for i in data.columns:
-    column_type[i] = [Detector(data[i])]
+    temp = Detector(data[i],i)
+    column_type[i] = [temp[0]]
+    data[i] = temp[1]
 col_type_frame = pd.DataFrame(column_type)
 
 col_type_frame_display = col_type_frame.transpose()
 col_type_frame_display.columns = ['Type']
-col_type_frame_display.index.name = 'Column Name'
 st.dataframe(col_type_frame_display)
 
 
 #User-Inputs
-st.sidebar.write("Select the Data You want to see")
-feature_1 = st.sidebar.selectbox('Select X-Axis Feature',cols)
+st.sidebar.header("Select the Data You want to Plot")
 temp = cols.copy()
-if feature_1!='None':temp.remove(feature_1)
+for i in column_type.keys():
+    if column_type[i] == ['Identifier']:
+        temp.remove(i)
+feature_1 = st.sidebar.selectbox('Select X-Axis Feature',temp)
+if feature_1!='None':
+    temp.remove(feature_1)
 feature_2 = st.sidebar.selectbox('Select Y-Axis Feature',temp)
+
 
 #DisplayFunctions
 def display_ContCont(var_1,var_2):
-    flag = st.radio("""Convert \'{}\' into Categorical? (By Binning)""".format(var_1), ['No', 'Yes'])
+    flag = st.radio("""Convert \'{}\' into Categorical?""".format(var_1), ['No','Yes'])
     if flag == 'Yes':
         no_of_bins = st.slider('Select the number of Categories for \'{}\''.format(var_1), min_value=2, max_value=10)
         q = np.linspace(0, 1, no_of_bins + 1)
@@ -75,11 +81,13 @@ def display_CatCat(var_1,var_2):
         global temp
         temp.remove('None')
         temp = [i for i in temp if (col_type_frame[i].values=='Continuous' or col_type_frame[i].values=='Binary Num')]
+        if var_2[:-7] in temp:
+            temp.remove(var_2[:-7])
         var_3 = st.selectbox('Value',temp)
         sp.plot_CatCatValue(data,var_1,var_2,var_3)
 
 def display_CatCont(var_1,var_2):
-    flag = st.radio("""Convert \'{}\' into Categorical? (By Binning)""".format(var_2), ['No', 'Yes'])
+    flag = st.radio("""Convert \'{}\' into Categorical?""".format(var_2), ['No','Yes'])
     if flag == 'Yes':
         no_of_bins = st.slider('Select the number of Categories for \'{}\''.format(var_2), min_value=2, max_value=10)
         q = np.linspace(0, 1, no_of_bins + 1)
