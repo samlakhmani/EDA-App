@@ -22,7 +22,7 @@ def Detector(variable,name):
             ans = 'Binary'
             mapper = {variable.unique()[0]:0,variable.unique()[1]:1}
             variable = variable.map(mapper)
-            st.write('**Modified the feature {}**'.format(name))
+            st.write('**Modified the feature \'{}\'**'.format(name))
             st.dataframe({'Key':mapper})
         elif variable.shape[0] == len(variable.unique()):
             ans = 'Identifier'

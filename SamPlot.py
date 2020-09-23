@@ -30,6 +30,38 @@ def plot_ContCont(data,var1,var2):
     plt.axis('off')
     st.pyplot(fig)
 
+def plot_ContContReg(data,var1,var2):
+    fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+    axs = axs.ravel()
+    axs[0].set_title('Scatter Plot')
+    sns.regplot(data[var1], data[var2], ax=axs[0])
+    plt.axis('off')
+    st.pyplot(fig)
+
+def plot_ContContLine(data,var1,var2):
+    fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+    axs = axs.ravel()
+    axs[0].set_title('Scatter Plot')
+    sns.lineplot(data[var1], data[var2], ax=axs[0])
+    plt.axis('off')
+    st.pyplot(fig)
+
+def plot_ContContScatterHue(data,var1,var2,var_3):
+    fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+    axs = axs.ravel()
+    axs[0].set_title('Scatter Plot')
+    sns.scatterplot(data[var1], data[var2],hue=var_3, data=data, ax=axs[0])
+    plt.axis('off')
+    st.pyplot(fig)
+
+def plot_ContContLineHue(data,var1,var2,var_3):
+    fig, axs = plt.subplots(1, 2, figsize=(15, 5))
+    axs = axs.ravel()
+    axs[0].set_title('Scatter Plot')
+    sns.lineplot(data[var1], data[var2],hue=var_3, data=data, ax=axs[0])
+    plt.axis('off')
+    st.pyplot(fig)
+
 def plot_CatCat(data,var1,var2):
     fig, axs = plt.subplots(2, 1, figsize=(10, 10))
     axs = axs.ravel()

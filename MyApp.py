@@ -28,7 +28,6 @@ if file:
     data = pd.read_csv(file)
 else:
     filename = file_selector()
-    st.write('You selected `%s`' % filename)
     data = pd.read_csv(filename)
 
 st.dataframe(data)
@@ -50,6 +49,7 @@ for i in data.columns:
     data[i] = temp[1]
 col_type_frame = pd.DataFrame(column_type)
 
+st.write(""" **Data Types** """)
 col_type_frame_display = col_type_frame.transpose()
 col_type_frame_display.columns = ['Type']
 st.dataframe(col_type_frame_display)
@@ -68,6 +68,9 @@ feature_2 = st.sidebar.selectbox('Select Y-Axis Feature',temp)
 
 
 #DisplayFunctions
+def display_ContCat():
+    sp.plot_ContCat()
+
 def display_ContCont(var_1,var_2):
     flag = st.radio("""Convert \'{}\' into Categorical?""".format(var_1), ['No','Yes'])
     if flag == 'Yes':
@@ -76,10 +79,27 @@ def display_ContCont(var_1,var_2):
         data[var_1 + '_Binned'] = pd.qcut(data[var_1], q)
         display_CatCont(var_1 + '_Binned', var_2)
     else:
-        sp.plot_ContCont(data,var_1,var_2)
-
-def display_ContCat():
-    sp.plot_ContCat()
+        selector = st.selectbox('Select Type of Plot',['Scatter Plot','Regression Plot','Line Plot',
+                                        'Scatter Plot with Category','Line Plot with Category'])
+        if selector == 'Scatter Plot':
+            sp.plot_ContCont(data,var_1,var_2)
+        if selector == 'Regression Plot':
+            sp.plot_ContContReg(data, var_1, var_2)
+        if selector == 'Line Plot':
+            sp.plot_ContContLine(data, var_1, var_2)
+        if selector == 'Scatter Plot with Category':
+            global temp
+            temp_hue = temp.copy()
+            temp_hue.remove('None')
+            temp_hue = [i for i in temp_hue if col_type_frame[i].values == 'Categorical']
+            hue = st.selectbox('Select Hue Category',temp_hue)
+            sp.plot_ContContScatterHue(data, var_1, var_2, hue)
+        if selector == 'Line Plot with Category':
+            temp_hue = temp.copy()
+            temp_hue.remove('None')
+            temp_hue = [i for i in temp_hue if col_type_frame[i].values == 'Categorical']
+            hue = st.selectbox('Select Hue Category',temp_hue)
+            sp.plot_ContContLineHue(data, var_1, var_2, hue)
 
 def display_CatCat(var_1,var_2):
     feature_3_check = st.radio('Target Variable',['Count','Other'])
@@ -88,11 +108,15 @@ def display_CatCat(var_1,var_2):
     if feature_3_check == 'Other':
         global temp
         temp.remove('None')
-        temp = [i for i in temp if (col_type_frame[i].values=='Continuous' or col_type_frame[i].values=='Binary Num')]
+        temp = [i for i in temp if
+                (col_type_frame[i].values=='Continuous' or col_type_frame[i].values=='Binary')]
         if var_2[:-7] in temp:
             temp.remove(var_2[:-7])
-        var_3 = st.selectbox('Value',temp)
-        sp.plot_CatCatValue(data,var_1,var_2,var_3)
+        if len(temp) !=0:
+            var_3 = st.selectbox('Value',temp)
+            sp.plot_CatCatValue(data,var_1,var_2,var_3)
+        else :
+            st.write('Select **\'Count\'** since there are no more continuous data to map to the plot')
 
 def display_CatCont(var_1,var_2):
     flag = st.radio("""Convert \'{}\' into Categorical?""".format(var_2), ['No','Yes'])
