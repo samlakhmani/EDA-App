@@ -3,6 +3,7 @@ import streamlit as st
 from VariableTypeDetector import Detector
 import SamPlot as sp
 import numpy as np
+import os
 
 st.set_option('deprecation.showfileUploaderEncoding', False)
 
@@ -16,12 +17,19 @@ The Objective of this project is to Make available different types of Explorator
 Click to [Download](https://web.stanford.edu/class/archive/cs/cs109/cs109.1166/stuff/titanic.csv) Default Data
 """)
 
+def file_selector(folder_path='Files'):
+    filenames = os.listdir(folder_path)
+    selected_filename = st.selectbox('Select a file', filenames)
+    return os.path.join(folder_path, selected_filename)
+
 st.sidebar.header('Upload Section')
 file = st.sidebar.file_uploader('Upload a Clean DataSet To Visualize',type=['csv'])
 if file:
     data = pd.read_csv(file)
 else:
-    data = pd.read_csv('titanic.csv')
+    filename = file_selector()
+    st.write('You selected `%s`' % filename)
+    data = pd.read_csv(filename)
 
 st.dataframe(data)
 cols = list(data.columns.values)
